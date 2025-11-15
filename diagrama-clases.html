@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama de Clases - Sistema de Encuestas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .diagram-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .class-box {
+            background: white;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .class-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .class-header {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .class-attributes {
+            background: #ecf0f1;
+            padding: 15px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .class-methods {
+            padding: 15px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 5px;
+        }
+
+        .attribute, .method {
+            padding: 5px 0;
+            font-size: 13px;
+            color: #34495e;
+            font-family: 'Courier New', monospace;
+        }
+
+        .attribute::before {
+            content: "- ";
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .method::before {
+            content: "+ ";
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .relationships {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .relationships h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .relationship-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .relationship-item strong {
+            color: #2c3e50;
+        }
+
+        .enums {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #ffc107;
+            margin-bottom: 30px;
+        }
+
+        .enums h2 {
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .enum-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .enum-box {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ffc107;
+        }
+
+        .enum-box h3 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .enum-value {
+            padding: 5px 10px;
+            background: #fff3cd;
+            margin: 5px 0;
+            border-radius: 3px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .notes {
+            background: #d1ecf1;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #17a2b8;
+        }
+
+        .notes h2 {
+            color: #0c5460;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .note-item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-left: 4px solid #17a2b8;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-symbol {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .private { color: #e74c3c; }
+        .public { color: #27ae60; }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Diagrama de Clases</h1>
+        <p class="subtitle">Sistema de Encuestas Empresariales</p>
+
+        <div class="legend">
+            <div class="legend-item">
+                <span class="legend-symbol private">-</span>
+                <span>Atributo Privado</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-symbol public">+</span>
+                <span>Método Público</span>
+            </div>
+        </div>
+
+        <!-- Clases Principales -->
+        <div class="diagram-grid">
+            <!-- Clase Empresa -->
+            <div class="class-box">
+                <div class="class-header">EMPRESA</div>
+                <div class="class-attributes">
+                    <div class="section-title">Atributos</div>
+                    <div class="attribute">idEmpresa: int</div>
+                    <div class="attribute">nombre: string</div>
+                    <div class="attribute">nit: string</div>
+                    <div class="attribute">direccion: string</div>
+                    <div class="attribute">telefono: string</div>
+                    <div class="attribute">email: string</div>
+                    <div class="attribute">fechaRegistro: date</div>
+                </div>
+                <div class="class-methods">
+                    <div class="section-title">Métodos</div>
+                    <div class="method">registrarEmpresa(): void</div>
+                    <div class="method">actualizarDatos(): void</div>
+                    <div class="method">obtenerEncuestas(): List&lt;Encuesta&gt;</div>
+                    <div class="method">obtenerUsuarios(): List&lt;Usuario&gt;</div>
+                </div>
+            </div>
+
+            <!-- Clase Usuario -->
+            <div class="class-box">
+                <div class="class-header">USUARIO</div>
+                <div class="class-attributes">
+                    <div class="section-title">Atributos</div>
+                    <div class="attribute">idUsuario: int</div>
+                    <div class="attribute">nombre: string</div>
+                    <div class="attribute">email: string</div>
+                    <div class="attribute">password: string</div>
+                    <div class="attribute">rol: string</div>
+                    <div class="attribute">estado: string</div>
+                    <div class="attribute">fechaRegistro: date</div>
+                    <div class="attribute">idEmpresa: int (FK)</div>
+                </div>
+                <div class="class-methods">
+                    <div class="section-title">Métodos</div>
+                    <div class="method">iniciarSesion(): boolean</div>
+                    <div class="method">cerrarSesion(): void</div>
+                    <div class="method">cambiarPassword(): void</div>
+                    <div class="method">activar(): void</div>
+                    <div class="method">desactivar(): void</div>
+                    <div class="method">crearEncuesta(): Encuesta</div>
+                    <div class="method">modificarEncuesta(id): void</div>
+                    <div class="method">consultarReportes(): List&lt;Reporte&gt;</div>
+                </div>
+            </div>
+
+            <!-- Clase Encuesta -->
+            <div class="class-box">
+                <div class="class-header">ENCUESTA</div>
+                <div class="class-attributes">
+                    <div class="section-title">Atributos</div>
+                    <div class="attribute">idEncuesta: int</div>
+                    <div class="attribute">nombre: string</div>
+                    <div class="attribute">descripcion: string</div>
+                    <div class="attribute">fechaInicio: date</div>
+                    <div class="attribute">fechaFin: date</div>
+                    <div class="attribute">estado: string</div>
+                    <div class="attribute">enlaceLargo: string</div>
+                    <div class="attribute">enlaceCorto: string</div>
+                    <div class="attribute">codigoQR: string</div>
+                    <div class="attribute">fechaCreacion: date</div>
+                    <div class="attribute">idUsuarioCreador: int (FK)</div>
+                    <div class="attribute">idEmpresa: int (FK)</div>
+                </div>
+                <div class="class-methods">
+                    <div class="section-title">Métodos</div>
+                    <div class="method">crear(): void</div>
+                    <div class="method">modificar(): void</div>
+                    <div class="method">duplicar(): Encuesta</div>
+                    <div class="method">eliminar(): void</div>
+                    <div class="method">generarEnlaceLargo(): string</div>
+                    <div class="method">generarEnlaceCorto(): string</div>
+                    <div class="method">generarCodigoQR(): string</div>
+                    <div class="method">agregarPregunta(p): void</div>
+                    <div class="method">obtenerPreguntas(): List&lt;Pregunta&gt;</div>
+                    <div class="method">cambiarEstado(estado): void</div>
+                </div>
+            </div>
+
+            <!-- Clase Pregunta -->
+            <div class="class-box">
+                <div class="class-header">PREGUNTA</div>
+                <div class="class-attributes">
+                    <div class="section-title">Atributos</div>
+                    <div class="attribute">idPregunta: int</div>
+                    <div class="attribute">textoPregunta: string</div>
+                    <div class="attribute">tipoPregunta: string</div>
+                    <div class="attribute">obligatoria: boolean</div>
+                    <div class="attribute">orden: int</div>
+                    <div class="attribute">idEncuesta: int (FK)</div>
+                </div>
+                <div class="class-methods">
+                    <div class="section-title">Métodos</div>
+                    <div class="method">crear(): void</div>
+                    <div class="method">modificar(): void</div>
+                    <div class="method">eliminar(): void</div>
+                    <div class="method">agregarOpcion(opcion): void</div>
+                    <div class="method">obtenerOpciones(): List&lt;Opcion&gt;</div>
+                </div>
+            </div>
+
+            <!-- Clase OpcionRespuesta -->
+            <div class="class-box">
+                <div class="class-header">OPCION_RESPUESTA</div>
+                <div class="class-attributes">
+                    <div class="section-title">Atributos</div>
+                    <div class="attribute">idOpcion: int</div>
+                    <div class="attribute">textoOpcion: string</div>
+                    <div class="attribute">valor: string</div>
+                    <div class="attribute">orden: int</div>
+                    <div class="attribute">idPregunta: int (FK)</div>
+                </div>
+                <div class="class-methods">
+                    <div class="section-title">Métodos</div>
+                    <div class="method">crear(): void</div>
+                    <div class="method">modificar(): void</div>
+                    <div class="method">eliminar(): void</div>
+                </div>
+            </div>
+
+            <!-- Clase RespuestaEncuesta -->
+            <div class="class-box">
+                <div class="class-header">RESPUESTA_ENCUESTA</div>
+                <div class="class-attributes">
+                    <div class="section-title">Atributos</div>
+                    <div class="attribute">idRespuesta: int</div>
+                    <div class="attribute">idEncuesta: int (FK)</div>
+                    <div class="attribute">fechaRespuesta: datetime</div>
+                    <div class="attribute">canalRespuesta: string</div>
+                    <div class="attribute">ipUsuario: string</div>
+                    <div class="attribute">completada: boolean</div>
+                </div>
+                <div class="class-methods">
+                    <div class="section-title">Métodos</div>
+                    <div class="method">registrar(): void</div>
+                    <div class="method">obtenerDetalles(): List&lt;Detalle&gt;</div>
+                </div>
+            </div>
+
+            <!-- Clase DetalleRespuesta -->
+            <div class="class-box">
+                <div class="class-header">DETALLE_RESPUESTA</div>
+                <div class="class-attributes">
+                    <div class="section-title">Atributos</div>
+                    <div class="attribute">idDetalle: int</div>
+                    <div class="attribute">idRespuesta: int (FK)</div>
+                    <div class="attribute">idPregunta: int (FK)</div>
+                    <div class="attribute">idOpcion: int (FK)</div>
+                    <div class="attribute">textoRespuesta: string</div>
+                    <div class="attribute">valorNumerico: int</div>
+                </div>
+                <div class="class-methods">
+                    <div class="section-title">Métodos</div>
+                    <div class="method">registrar(): void</div>
+                    <div class="method">obtenerValor(): string</div>
+                </div>
+            </div>
+
+            <!-- Clase Reporte -->
+            <div class="class-box">
+                <div class="class-header">REPORTE</div>
+                <div class="class-attributes">
+                    <div class="section-title">Atributos</div>
+                    <div class="attribute">idReporte: int</div>
+                    <div class="attribute">idEncuesta: int (FK)</div>
+                    <div class="attribute">idUsuario: int (FK)</div>
+                    <div class="attribute">fechaGeneracion: datetime</div>
+                    <div class="attribute">formato: string</div>
+                    <div class="attribute">rutaArchivo: string</div>
+                </div>
+                <div class="class-methods">
+                    <div class="section-title">Métodos</div>
+                    <div class="method">generar(): void</div>
+                    <div class="method">descargar(): file</div>
+                    <div class="method">generarEstadisticas(): object</div>
+                    <div class="method">exportarExcel(): file</div>
+                    <div class="method">exportarPDF(): file</div>
+                    <div class="method">aplicarFiltros(filtros): void</div>
+                </div>
+            </div>
+
+            <!-- Clase IntegracionWhatsapp -->
+            <div class="class-box">
+                <div class="class-header">INTEGRACION_WHATSAPP</div>
+                <div class="class-attributes">
+                    <div class="section-title">Atributos</div>
+                    <div class="attribute">idIntegracion: int</div>
+                    <div class="attribute">idEncuesta: int (FK)</div>
+                    <div class="attribute">numeroWhatsapp: string</div>
+                    <div class="attribute">tokenAPI: string</div>
+                    <div class="attribute">activo: boolean</div>
+                </div>
+                <div class="class-methods">
+                    <div class="section-title">Métodos</div>
+                    <div class="method">enviarEncuesta(numero): void</div>
+                    <div class="method">recibirRespuesta(msg): void</div>
+                    <div class="method">procesarRespuesta(datos): Respuesta</div>
+                    <div class="method">validarFormato(): boolean</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relaciones -->
+        <div class="relationships">
+            <h2>🔗 Relaciones entre Clases</h2>
+            <div class="relationship-item">
+                <strong>EMPRESA</strong> (1) ──── (*) <strong>USUARIO</strong> | Una empresa tiene muchos usuarios autorizados
+            </div>
+            <div class="relationship-item">
+                <strong>EMPRESA</strong> (1) ──── (*) <strong>ENCUESTA</strong> | Una empresa tiene muchas encuestas
+            </div>
+            <div class="relationship-item">
+                <strong>USUARIO</strong> (1) ──── (*) <strong>ENCUESTA</strong> | Un usuario crea muchas encuestas
+            </div>
+            <div class="relationship-item">
+                <strong>ENCUESTA</strong> (1) ──── (*) <strong>PREGUNTA</strong> | Una encuesta contiene muchas preguntas
+            </div>
+            <div class="relationship-item">
+                <strong>PREGUNTA</strong> (1) ──── (*) <strong>OPCION_RESPUESTA</strong> | Una pregunta tiene muchas opciones
+            </div>
+            <div class="relationship-item">
+                <strong>ENCUESTA</strong> (1) ──── (*) <strong>RESPUESTA_ENCUESTA</strong> | Una encuesta recibe muchas respuestas
+            </div>
+            <div class="relationship-item">
+                <strong>RESPUESTA_ENCUESTA</strong> (1) ──── (*) <strong>DETALLE_RESPUESTA</strong> | Una respuesta tiene muchos detalles
+            </div>
+            <div class="relationship-item">
+                <strong>PREGUNTA</strong> (1) ──── (*) <strong>DETALLE_RESPUESTA</strong> | Una pregunta tiene muchas respuestas
+            </div>
+            <div class="relationship-item">
+                <strong>ENCUESTA</strong> (1) ──── (*) <strong>REPORTE</strong> | Una encuesta puede tener muchos reportes
+            </div>
+            <div class="relationship-item">
+                <strong>USUARIO</strong> (1) ──── (*) <strong>REPORTE</strong> | Un usuario genera muchos reportes
+            </div>
+            <div class="relationship-item">
+                <strong>ENCUESTA</strong> (1) ──── (0..1) <strong>INTEGRACION_WHATSAPP</strong> | Una encuesta puede tener integración WhatsApp
+            </div>
+        </div>
+
+        <!-- Enumeraciones -->
+        <div class="enums">
+            <h2>📋 Tipos de Datos Enumerados</h2>
+            <div class="enum-grid">
+                <div class="enum-box">
+                    <h3>RolUsuario</h3>
+                    <div class="enum-value">ADMINISTRADOR</div>
+                    <div class="enum-value">CREADOR</div>
+                    <div class="enum-value">ANALISTA</div>
+                </div>
+                <div class="enum-box">
+                    <h3>EstadoUsuario</h3>
+                    <div class="enum-value">ACTIVO</div>
+                    <div class="enum-value">INACTIVO</div>
+                </div>
+                <div class="enum-box">
+                    <h3>EstadoEncuesta</h3>
+                    <div class="enum-value">ACTIVA</div>
+                    <div class="enum-value">FINALIZADA</div>
+                    <div class="enum-value">BORRADOR</div>
+                </div>
+                <div class="enum-box">
+                    <h3>TipoPregunta</h3>
+                    <div class="enum-value">OPCION_MULTIPLE</div>
+                    <div class="enum-value">TEXTO_CORTO</div>
+                    <div class="enum-value">TEXTO_LARGO</div>
+                    <div class="enum-value">ESCALA</div>
+                    <div class="enum-value">SI_NO</div>
+                    <div class="enum-value">CASILLAS</div>
+                </div>
+                <div class="enum-box">
+                    <h3>CanalRespuesta</h3>
+                    <div class="enum-value">WEB</div>
+                    <div class="enum-value">WHATSAPP</div>
+                </div>
+                <div class="enum-box">
+                    <h3>FormatoReporte</h3>
+                    <div class="enum-value">XLS</div>
+                    <div class="enum-value">PDF</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notas Importantes -->
+        <div class="notes">
+            <h2>⚠️ Notas Importantes para la Implementación</h2>
+            <div class="note-item">
+                <strong>1.</strong> Todas las clases deben implementar validaciones de datos
+            </div>
+            <div class="note-item">
+                <strong>2.</strong> Las contraseñas deben almacenarse encriptadas (bcrypt, SHA-256)
+            </div>
+            <div class="note-item">
+                <strong>3.</strong> Los enlaces cortos deben generarse con algoritmos únicos
+            </div>
+            <div class="note-item">
+                <strong>4.</strong> Los códigos QR se generan usando librerías especializadas
+            </div>
+            <div class="note-item">
+                <strong>5.</strong> La integración con WhatsApp requiere API de WhatsApp Business
+            </div>
+            <div class="note-item">
+                <strong>6.</strong> Los reportes deben generarse de forma asíncrona para encuestas grandes
+            </div>
+            <div class="note-item">
+                <strong>7.</strong> Implementar soft delete para encuestas y preguntas (no eliminar físicamente)
+            </div>
+            <div class="note-item">
+                <strong>8.</strong> Auditoría: registrar quién y cuándo modifica cada entidad
+            </div>
+            <div class="note-item">
+                <strong>9.</strong> Índices en base de datos para: email, idEmpresa, idEncuesta, fechas
+            </div>
+            <div class="note-item">
+                <strong>10.</strong> Implementar caché para reportes frecuentemente consultados
+            </div>
+        </div>
+
+        <p style="text-align: center; color: #7f8c8d; margin-top: 30px; padding-top: 20px; border-top: 2px solid #ecf0f1;">
+            Sistema de Encuestas - Diagrama de Clases | Noviembre 2024
+        </p>
+    </div>
+</body>
+</html>
