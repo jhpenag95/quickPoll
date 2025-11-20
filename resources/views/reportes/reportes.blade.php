@@ -46,7 +46,7 @@
                 </div>
 
                 <div style="margin-top: 15px;">
-                    <button type="submit" class="btn">Generar Reporte</button>
+                    {{-- <button type="submit" class="btn">Generar Reporte</button> --}}
                     <button type="button" class="btn btn-success">Descargar Excel (.xls)</button>
                     <button type="button" class="btn btn-danger">Descargar PDF</button>
                 </div>

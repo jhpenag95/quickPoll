@@ -11,7 +11,7 @@
     <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h3>Usuarios Autorizados</h3>
-            <a href="{{ url('/usuarios/agregarUsuario') }}" class="btn btn-success">+ Agregar Usuario</a>
+            <a href="{{ url('/agregar-usuario') }}" class="btn btn-success">+ Agregar Usuario</a>   
         </div>
 
         <table>

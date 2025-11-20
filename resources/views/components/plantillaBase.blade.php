@@ -17,6 +17,8 @@
 </head>
 
 <body>
+    {{-- @auth permite renderizar el contenido solo si el usuario está autenticado --}}
+    @auth 
     <header>
         <div class="container_base">
             <h1>📊 Sistema de Encuestas</h1>
@@ -24,6 +26,7 @@
                 <ul>
                     <li><a href="{{ url('/dashboard') }}">Inicio</a></li>
                     <li><a href="{{ url('/encuestas') }}">Encuestas</a></li>
+                    <li><a href="{{ url('/whatsapp') }}">Enviar por WhatsApp</a></li>
                     <li><a href="{{ url('/reportes') }}">Reportes</a></li>
                     <li><a href="{{ url('/usuarios') }}">Usuarios</a></li>
                     <li><a href="{{ url('/logout') }}">Cerrar Sesión</a></li>
@@ -31,6 +34,7 @@
             </nav>
         </div>
     </header>
+    @endauth
 
     <div class="container_base">
         @yield('content')

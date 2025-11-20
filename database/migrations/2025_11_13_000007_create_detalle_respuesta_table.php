@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('detalle_respuesta', function (Blueprint $table) {
             $table->bigIncrements('idDetalle');
-            $table->string('textoRespuesta');
-            $table->integer('valorNumerico');
+            $table->string('textoRespuesta')->nullable();
+            $table->integer('valorNumerico')->nullable();
             
             //Un detalle respuesta pertenece a una respuesta
             $table->unsignedBigInteger('idRespuesta');
@@ -25,12 +25,13 @@ return new class extends Migration
             $table->foreign('idPregunta')->references('idPregunta')->on('preguntas')->onDelete('cascade');
             
             //Un detalle respuesta pertenece a una opcion respuesta
-            $table->unsignedBigInteger('idOpcionRespuesta');
-            $table->foreign('idOpcionRespuesta')->references('idOpcionRespuesta')->on('opcionesrespuesta')->onDelete('cascade');
+            $table->unsignedBigInteger('idOpcion')->nullable();  
+            $table->foreign('idOpcion')->references('idOpcion')->on('opcionesrespuesta')->onDelete('set null');
+                
             $table->timestamps();
             $table->index(['idRespuesta']);
             $table->index(['idPregunta']);
-            $table->index(['idOpcionRespuesta']);
+            $table->index(['idOpcion']);
         });
     }
 

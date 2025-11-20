@@ -78,7 +78,8 @@
                     <label for="rol">Rol *</label>
                     <select id="rol" name="rol" required>
                         <option value="admin">Administrador</option>
-                        <option value="user">Usuario</option>
+                        <option value="creador_encuesta">Creador de Encuestas</option>
+                        <option value="analista">Analista</option>
                     </select>
                 </div>
 
