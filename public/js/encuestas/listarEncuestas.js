@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const idAttr = row.idEncuesta ? `data-id="${row.idEncuesta}"` : '';
                     return `
                     <div class="actions">
-                        <a href="#" class="btn btn-info btn-ver" ${idAttr}>Ver</a>
+                        <a href="/encuestas/ver/${row.idEncuesta}" class="btn btn-info btn-ver" ${idAttr}>Ver</a>
                         <a href="/encuestas/editarEncuesta/${row.idEncuesta}" class="btn btn-primary btn-editar" ${idAttr}>Editar</a>
                         <button class="btn btn-danger btn-eliminar" ${idAttr}>Eliminar</button>
                     </div>

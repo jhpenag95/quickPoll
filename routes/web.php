@@ -35,11 +35,14 @@ Route::get('/reportes', [ReportesController::class, 'index'])->name('reportes');
 Route::get('/reportes/encuestas', [ReportesController::class, 'encuestasEmpresa'])->name('reportes.encuestas');
 Route::get('/reportes/generar', [ReportesController::class, 'generar'])->name('reportes.generar');
 Route::get('/reportes/excel', [ReportesController::class, 'excel'])->name('reportes.excel');
+Route::get('/reportes/pdf', [ReportesController::class, 'pdf'])->name('reportes.pdf');
 
 Route::get('/encuestas', [encuestasController::class, 'index'])->name('encuestas');
 Route::get('/encuestas/crearEncuesta', [encuestasController::class, 'crearEncuesta'])->name('crearEncuesta');
 Route::get('/encuestas/listarEncuestas', [encuestasController::class, 'listarEncuestas'])->name('listarEncuestas');
 Route::get('/encuestas/editarEncuesta/{id}', [encuestasController::class, 'editarEncuesta'])->name('editarEncuesta');
+Route::get('/encuestas/ver/{id}', [encuestasController::class, 'verEncuesta'])->name('encuestas.ver');
+Route::get('/encuestas/ver/{id}', [encuestasController::class, 'verEncuesta'])->name('verEncuesta');
 
 
 
@@ -66,4 +69,5 @@ Route::get('/s/{code}', [encuestasController::class, 'short'])->name('encuestas.
 Route::get('/agregar-usuario', [UserController::class, 'agregar_usuario'])->name('agregar-usuario');
 Route::get('/encuesta/{id}/whatsapp', [encuestasController::class, 'whatsapp'])->name('encuestas.whatsapp');
 Route::post('/encuesta/{id}/whatsapp/enviar', [encuestasController::class, 'enviarWhatsapp'])->name('encuestas.whatsapp.enviar');
+Route::get('/qr/{id}', [encuestasController::class, 'qr'])->name('encuestas.qr');
 

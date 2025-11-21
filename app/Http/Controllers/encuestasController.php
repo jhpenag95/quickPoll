@@ -11,6 +11,10 @@ use App\Models\Encuestas;
 use App\Models\Preguntas;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 
 class encuestasController extends Controller
 {
@@ -76,6 +80,43 @@ class encuestasController extends Controller
             'preguntas' => $preguntas,
             'opciones' => $opciones,
         ]);
+    }
+
+    public function verEncuesta($id)
+    {
+        $encuesta = Encuestas::findOrFail($id);
+        $preguntas = Preguntas::where('idEncuesta', $encuesta->idEncuesta)
+            ->orderBy('orden')
+            ->get();
+        $opciones = DB::table('opcionesrespuesta')
+            ->whereIn('idPregunta', $preguntas->pluck('idPregunta'))
+            ->orderBy('orden')
+            ->get()
+            ->groupBy('idPregunta');
+        $respuestasCount = DB::table('respuesta_encuesta')
+            ->where('idEncuesta', $encuesta->idEncuesta)
+            ->count();
+        $enlacePublico = route('encuestas.public', ['id' => $encuesta->idEncuesta]);
+        return view('encuestas.verEncuesta', [
+            'encuesta' => $encuesta,
+            'preguntas' => $preguntas,
+            'opciones' => $opciones,
+            'respuestasCount' => $respuestasCount,
+            'enlacePublico' => $enlacePublico,
+        ]);
+    }
+
+    public function qr($id)
+    {
+        $encuesta = Encuestas::findOrFail($id);
+        $url = route('encuestas.public', ['id' => $encuesta->idEncuesta]);
+        $renderer = new ImageRenderer(
+            new RendererStyle(256),
+            new SvgImageBackEnd()
+        );
+        $writer = new Writer($renderer);
+        $svg = $writer->writeString($url);
+        return response($svg, 200)->header('Content-Type', 'image/svg+xml');
     }
 
     public function store(Request $request)
@@ -255,6 +296,8 @@ class encuestasController extends Controller
         return redirect()->route('encuestas')
             ->with('status', 'Encuesta actualizada correctamente');
     }
+
+    
 
     public function public($id)
     {
