@@ -29,6 +29,55 @@ class encuestasController extends Controller
         return view('encuestas.crearEncuesta');
     }
 
+    public function listarEncuestas()
+    {
+        if (!Auth::check()) {
+            return response()->json([]);
+        }
+
+        $encuestas = Encuestas::select(
+            'encuestas.idEncuesta',
+            'encuestas.nombre',
+            'encuestas.created_at',
+            DB::raw('COUNT(respuesta_encuesta.idRespuesta) as cantidad'),
+            'encuestas.fechaInicio',
+            'encuestas.fechaFin',
+            'encuestas.estado'
+        )
+            ->where('encuestas.idEmpresa', Auth::user()->empresa_id)
+            ->leftJoin('respuesta_encuesta', 'encuestas.idEncuesta', '=', 'respuesta_encuesta.idEncuesta')
+            ->groupBy(
+                'encuestas.idEncuesta',
+                'encuestas.nombre',
+                'encuestas.created_at',
+                'encuestas.fechaInicio',
+                'encuestas.fechaFin',
+                'encuestas.estado'
+            )
+            ->get();
+
+        return response()->json($encuestas);
+    }
+
+    public function editarEncuesta($id)
+    {
+        $encuesta = Encuestas::findOrFail($id);
+        $preguntas = Preguntas::where('idEncuesta', $encuesta->idEncuesta)
+            ->orderBy('orden')
+            ->get();
+        $opciones = DB::table('opcionesrespuesta')
+            ->whereIn('idPregunta', $preguntas->pluck('idPregunta'))
+            ->orderBy('orden')
+            ->get()
+            ->groupBy('idPregunta');
+
+        return view('encuestas.editarEncuesta', [
+            'encuesta' => $encuesta,
+            'preguntas' => $preguntas,
+            'opciones' => $opciones,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -127,6 +176,84 @@ class encuestasController extends Controller
             ->with('enlaceLargo', $encuesta->enlaceLargo)
             ->with('enlaceCorto', $encuesta->enlaceCorto)
             ->with('codigoQR', $encuesta->codigoQR);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $encuesta = Encuestas::findOrFail($id);
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'fechaInicio' => 'required|date',
+            'fechaFin' => 'required|date|after_or_equal:fechaInicio',
+        ]);
+
+        $encuesta->nombre = $validated['nombre'];
+        $encuesta->descripcion = $validated['descripcion'] ?? null;
+        $encuesta->fechaInicio = $validated['fechaInicio'];
+        $encuesta->fechaFin = $validated['fechaFin'];
+        $encuesta->updated_at = now();
+        $encuesta->save();
+
+        DB::transaction(function () use ($encuesta, $request) {
+            $pregs = Preguntas::where('idEncuesta', $encuesta->idEncuesta)->get();
+            if ($pregs->count() > 0) {
+                DB::table('opcionesrespuesta')
+                    ->whereIn('idPregunta', $pregs->pluck('idPregunta'))
+                    ->delete();
+            }
+            DB::table('preguntas')->where('idEncuesta', $encuesta->idEncuesta)->delete();
+
+            $raw = $request->all();
+            $preguntasData = [];
+            foreach ($raw as $key => $value) {
+                if (preg_match('/^pregunta-(\d+)$/', $key, $m)) {
+                    $idx = (int) $m[1];
+                    $preguntasData[$idx] = $preguntasData[$idx] ?? ['opciones' => []];
+                    $preguntasData[$idx]['pregunta'] = $value;
+                } elseif (preg_match('/^tipo-respuesta-(\d+)$/', $key, $m)) {
+                    $idx = (int) $m[1];
+                    $preguntasData[$idx] = $preguntasData[$idx] ?? ['opciones' => []];
+                    $preguntasData[$idx]['tipo'] = $value;
+                } elseif (preg_match('/^opcion-(\d+)-(\d+)$/', $key, $m)) {
+                    $pIdx = (int) $m[1];
+                    $oIdx = (int) $m[2];
+                    $preguntasData[$pIdx] = $preguntasData[$pIdx] ?? ['opciones' => []];
+                    $preguntasData[$pIdx]['opciones'][$oIdx] = $value;
+                }
+            }
+
+            ksort($preguntasData);
+            foreach ($preguntasData as $i => $p) {
+                $preguntaModel = new Preguntas();
+                $preguntaModel->idEncuesta = $encuesta->idEncuesta;
+                $preguntaModel->textoPregunta = $p['pregunta'] ?? '';
+                $preguntaModel->tipoPregunta = $p['tipo'] ?? 'texto-corto';
+                $preguntaModel->obligatoria = 0;
+                $preguntaModel->orden = $i;
+                $preguntaModel->created_at = now();
+                $preguntaModel->updated_at = now();
+                $preguntaModel->save();
+
+                if (($p['tipo'] ?? '') === 'opcion-multiple' && !empty($p['opciones'])) {
+                    ksort($p['opciones']);
+                    $orden = 1;
+                    foreach ($p['opciones'] as $texto) {
+                        DB::table('opcionesrespuesta')->insert([
+                            'textoOpcion' => $texto,
+                            'valor' => null,
+                            'orden' => $orden++,
+                            'idPregunta' => $preguntaModel->idPregunta,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                }
+            }
+        });
+
+        return redirect()->route('encuestas')
+            ->with('status', 'Encuesta actualizada correctamente');
     }
 
     public function public($id)

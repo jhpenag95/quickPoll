@@ -25,16 +25,29 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 
 Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios');
 Route::post('/usuario/registrar', [UserController::class, 'store'])->name('usuario.registrar');
+Route::get('/usuarios/listar', [UserController::class, 'listar'])->name('usuarios.listar');
+Route::get('/usuarios/editar/{id}', [UserController::class, 'editar'])->name('usuarios.editar');
+Route::put('/usuarios/{id}', [UserController::class, 'update'])->name('usuarios.update');
 
 
 
 Route::get('/reportes', [ReportesController::class, 'index'])->name('reportes');
+Route::get('/reportes/encuestas', [ReportesController::class, 'encuestasEmpresa'])->name('reportes.encuestas');
+Route::get('/reportes/generar', [ReportesController::class, 'generar'])->name('reportes.generar');
+Route::get('/reportes/excel', [ReportesController::class, 'excel'])->name('reportes.excel');
 
 Route::get('/encuestas', [encuestasController::class, 'index'])->name('encuestas');
 Route::get('/encuestas/crearEncuesta', [encuestasController::class, 'crearEncuesta'])->name('crearEncuesta');
+Route::get('/encuestas/listarEncuestas', [encuestasController::class, 'listarEncuestas'])->name('listarEncuestas');
+Route::get('/encuestas/editarEncuesta/{id}', [encuestasController::class, 'editarEncuesta'])->name('editarEncuesta');
+
+
 
 // Crear encuesta
 Route::post('/encuestas', [encuestasController::class, 'store'])->name('encuestas.store');
+
+// Actualizar encuesta
+Route::put('/encuestas/{id}', [encuestasController::class, 'update'])->name('encuestas.update');
 
 // Enlace público largo
 Route::get('/encuesta/{id}', [encuestasController::class, 'public'])->name('encuestas.public');

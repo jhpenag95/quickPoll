@@ -52,7 +52,7 @@
             </div>
             <div class="form-group" style="margin-top: 30px;">
                 <button type="submit" class="btn btn-success" onclick="validarFormulario(event)">Agregar Usuario</button>
-                <a href="usuarios.html" class="btn btn-secondary">Cancelar</a>
+                <a href="{{ url('/usuarios') }}" class="btn btn-secondary">Cancelar</a>
             </div>
         </form>
     </div>
