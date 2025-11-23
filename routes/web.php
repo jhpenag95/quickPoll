@@ -16,6 +16,9 @@ Route::get('/login', [IndexController::class, 'index'])->name('login.form'); // 
 Route::post('/login', [LoginController::class, 'login'])->name('login'); // Autenticar credenciales (POST)
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout'); // Cerrar sesión
 
+//api
+Route::get('/api/dashboard/statistics', [DashboardController::class, 'statistics'])->name('api.dashboard.statistics'); // Obtener estadísticas
+
 // Vistas abiertas para invitados (si aplica)
 Route::middleware('guest')->group(function () {
     Route::get('/whatsapp', [encuestasController::class, 'whatsapp_encuesta'])->name('whatsapp'); // Vista informativa de WhatsApp
