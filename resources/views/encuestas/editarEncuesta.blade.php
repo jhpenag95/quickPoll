@@ -110,7 +110,7 @@
             <!-- Botones de Acción -->
             <div class="form-group" style="margin-top: 30px;">
                 <button type="submit" class="btn btn-success">Guardar Cambios</button>
-                <a href="{{ route('encuestas') }}" class="btn btn-secondary">Cancelar</a>
+                <a href="{{ url('/encuestas') }}" class="btn btn-secondary">Cancelar</a>
             </div>
         </form>
     </div>

@@ -52,8 +52,16 @@ $(function () {
     html += statBox('Total Respuestas', data.totalRespuestas || 0);
     var prom = data.promedioSatisfaccion != null ? (data.promedioSatisfaccion + '/5') : 'N/D';
     html += statBox('Promedio Satisfacción', prom);
-    html += statBox('Tasa de Respuesta', 'N/D');
-    html += statBox('Tiempo Promedio', 'N/D');
+    var tasa = (data.tasaRespuesta != null) ? (data.tasaRespuesta + '%') : 'N/D';
+    html += statBox('Tasa de Respuesta', tasa);
+    var tprom = 'N/D';
+    if (data.tiempoPromedio != null) {
+      var secs = Number(data.tiempoPromedio) || 0;
+      var min = Math.floor(secs / 60);
+      var s = secs % 60;
+      tprom = (min > 0 ? (min + ' min ') : '') + s + ' s';
+    }
+    html += statBox('Tiempo Promedio', tprom);
     html += '</div>';
 
     (data.preguntas || []).forEach(function (p, idx) {

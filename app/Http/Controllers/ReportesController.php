@@ -143,6 +143,14 @@ class ReportesController extends Controller
             $baseRespuestas = $baseRespuestas->whereBetween('fechaRespuesta', [$desde, $hasta]);
         }
         $totalRespuestas = (int) $baseRespuestas->count();
+        // Tasa de respuesta: respuestas / visitas únicas
+        $baseVisitas = DB::table('encuesta_visitas')->where('idEncuesta', $encuestaId);
+        if ($desde && $hasta) {
+            $baseVisitas = $baseVisitas->whereBetween('created_at', [$desde, $hasta]);
+        }
+        $visitasUnicas = Schema::hasTable('encuesta_visitas')
+            ? (int) $baseVisitas->distinct()->count('ipUsuario')
+            : 0;
 
         $preguntas = Preguntas::where('idEncuesta', $encuestaId)
             ->orderBy('orden')
@@ -301,6 +309,12 @@ class ReportesController extends Controller
         }
 
         $promedioSatisfaccion = $escalaCount > 0 ? round($escalaSum / $escalaCount, 2) : null;
+        $tiempoPromedio = null;
+        if (Schema::hasColumn('respuesta_encuesta', 'duracionSegundos')) {
+            $avgTimeRow = (clone $baseRespuestas)->select(DB::raw('AVG(duracionSegundos) as avgTime'))->first();
+            $tiempoPromedio = $avgTimeRow && $avgTimeRow->avgTime ? round($avgTimeRow->avgTime) : null;
+        }
+        $tasaRespuesta = ($visitasUnicas > 0 && $totalRespuestas > 0) ? round(($totalRespuestas * 100) / $visitasUnicas) : null;
 
         return [
             'encuesta' => [
@@ -314,6 +328,8 @@ class ReportesController extends Controller
             ],
             'totalRespuestas' => $totalRespuestas,
             'promedioSatisfaccion' => $promedioSatisfaccion,
+            'tasaRespuesta' => $tasaRespuesta,
+            'tiempoPromedio' => $tiempoPromedio,
             'preguntas' => $resultPreguntas,
         ];
     }

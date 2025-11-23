@@ -73,10 +73,16 @@ class UserController extends Controller
 
     public function listar(Request $request)
     {
-        $usuarios = User::select('id', 'name as nombre', 'email', 'rol', 'estado', 'created_at')->get();
-        return response()->json($usuarios); 
-    }
+        // Get the authenticated user's company
+        $empresaId = auth()->user()->empresa_id;
 
+        // Filter users by the same company
+        $usuarios = User::select('id', 'name as nombre', 'email', 'rol', 'estado', 'created_at')
+            ->where('empresa_id', $empresaId)
+            ->get();
+
+        return response()->json($usuarios);
+    }
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -112,5 +118,13 @@ class UserController extends Controller
             return response()->json(['status' => 'success']);
         }
         return redirect()->route('usuarios')->with('status', 'Usuario actualizado correctamente');
+    }
+
+    public function eliminar($id)
+    {
+        $user = User::findOrFail($id);
+        $user->estado = 'INACTIVO';
+        $user->save();
+        return redirect()->route('usuarios')->with('status', 'Usuario inactivado correctamente');
     }
 }

@@ -38,7 +38,7 @@ $(document).ready(function () {
                     return `
                     <div class="actions">
                         <a href="/usuarios/editar/${row.id}" class="btn btn-primary btn-editar" ${idAttr}>Editar</a>
-                        <button class="btn ${toggleClass} btn-toggle" ${idAttr} data-estado="${row.estado}">${toggleText}</button>
+                        <a href="/usuarios/eliminar/${row.id}" class="btn ${toggleClass} btn-toggle" ${idAttr} data-estado="${row.estado}">${toggleText}</a>
                     </div>
                 `;
                 }
@@ -49,20 +49,4 @@ $(document).ready(function () {
             url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
         }
     });
-});
-
-// Navegación directa manejada por el enlace "Editar"
-
-$('#usuariosTable').on('click', '.btn-toggle', function (e) {
-    e.preventDefault();
-    const id = $(this).data('id');
-    const estado = $(this).data('estado');
-    if (window.Swal) {
-        Swal.fire({
-            icon: 'info',
-            title: 'Cambiar estado',
-            text: 'Funcionalidad en desarrollo',
-            confirmButtonColor: '#27ae60'
-        });
-    }
 });

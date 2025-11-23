@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="actions">
                         <a href="/encuestas/ver/${row.idEncuesta}" class="btn btn-info btn-ver" ${idAttr}>Ver</a>
                         <a href="/encuestas/editarEncuesta/${row.idEncuesta}" class="btn btn-primary btn-editar" ${idAttr}>Editar</a>
-                        <button class="btn btn-danger btn-eliminar" ${idAttr}>Eliminar</button>
+                        <a href="/encuestas/eliminar/${row.idEncuesta}" class="btn btn-danger btn-eliminar" ${idAttr}>Eliminar</a>
                     </div>
                 `;
                 }

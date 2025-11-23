@@ -17,8 +17,9 @@
                 @endif
             </div>
 
-            <form action="{{ route('encuestas.responder', ['id' => $encuesta->idEncuesta]) }}" method="POST">
+            <form id="form-encuesta" action="{{ route('encuestas.responder', ['id' => $encuesta->idEncuesta]) }}" method="POST">
                 @csrf
+                <input type="hidden" name="duracion" id="duracion" value="0">
 
                 @foreach ($preguntas as $index => $pregunta)
                     <div class="pregunta-card">
@@ -89,4 +90,17 @@
 @endsection
 
 @push('scripts')
+<script>
+  (function(){
+    var start = Date.now();
+    var form = document.getElementById('form-encuesta');
+    var hidden = document.getElementById('duracion');
+    if (form && hidden) {
+      form.addEventListener('submit', function(){
+        var secs = Math.floor((Date.now() - start) / 1000);
+        hidden.value = String(secs);
+      });
+    }
+  })();
+</script>
 @endpush

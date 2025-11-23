@@ -82,6 +82,13 @@ class encuestasController extends Controller
         ]);
     }
 
+    public function eliminarEncuesta($id)
+    {
+        $encuesta = Encuestas::findOrFail($id);
+        $encuesta->delete();
+        return redirect()->route('encuestas')->with('success', 'Encuesta eliminada correctamente.');
+    }
+
     public function verEncuesta($id)
     {
         $encuesta = Encuestas::findOrFail($id);
@@ -304,9 +311,31 @@ class encuestasController extends Controller
         // Buscar la encuesta por ID
         $encuesta = Encuestas::findOrFail($id);
 
-        // Verificar si la encuesta ya ha sido respondida
-        if (request()->session()->get('encuesta_'.$encuesta->idEncuesta.'_respondida')) {
+        // Evitar múltiples respuestas: sesión o IP ya respondida
+        $ip = request()->ip();
+        $ua = request()->header('User-Agent');
+        $yaRespondioSesion = request()->session()->get('encuesta_'.$encuesta->idEncuesta.'_respondida');
+        $yaRespondioIp = DB::table('respuesta_encuesta')
+            ->where('idEncuesta', $encuesta->idEncuesta)
+            ->where('ipUsuario', $ip)
+            ->exists();
+        if ($yaRespondioSesion || $yaRespondioIp) {
             return redirect()->route('encuestas.gracias', ['id' => $encuesta->idEncuesta]);
+        }
+
+        // Registrar visita única por IP
+        $existsVisit = DB::table('encuesta_visitas')
+            ->where('idEncuesta', $encuesta->idEncuesta)
+            ->where('ipUsuario', $ip)
+            ->exists();
+        if (!$existsVisit && Schema::hasTable('encuesta_visitas')) {
+            DB::table('encuesta_visitas')->insert([
+                'idEncuesta' => $encuesta->idEncuesta,
+                'ipUsuario' => $ip,
+                'userAgent' => $ua,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
 
         // Obtener preguntas y opciones para la encuesta
@@ -351,12 +380,25 @@ class encuestasController extends Controller
     {
         $encuesta = Encuestas::findOrFail($id);
 
+        // Evitar múltiples respuestas por IP
+        $ip = $request->ip();
+        $dur = (int) ($request->input('duracion') ?? 0);
+        $existe = DB::table('respuesta_encuesta')
+            ->where('idEncuesta', $encuesta->idEncuesta)
+            ->where('ipUsuario', $ip)
+            ->exists();
+        if ($existe) {
+            $request->session()->put('encuesta_'.$encuesta->idEncuesta.'_respondida', true);
+            return redirect()->route('encuestas.gracias', ['id' => $encuesta->idEncuesta]);
+        }
+
         $respuestaId = DB::table('respuesta_encuesta')->insertGetId([
             'fechaRespuesta'        => now(),
             'canalRespuesta'        => 'web',
-            'ipUsuario'             => $request->ip(),// Obtener la IP del usuario
+            'ipUsuario'             => $ip,
             'completada'            => true,
             'idEncuesta'            => $encuesta->idEncuesta,
+            'duracionSegundos'      => Schema::hasColumn('respuesta_encuesta', 'duracionSegundos') ? $dur : null,
             'created_at'            => now(),
             'updated_at'            => now(),
         ]);
