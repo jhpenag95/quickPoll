@@ -92,6 +92,7 @@ Route::get('/s/{code}', [encuestasController::class, 'short'])->name('encuestas.
 // Integraciones y utilidades (requiere autenticación)
 Route::middleware('auth')->group(function () {
     Route::get('/agregar-usuario', [UserController::class, 'agregar_usuario'])->name('agregar-usuario'); // Vista alta usuario
+    Route::get('/whatsapp', [encuestasController::class, 'whatsapp_encuesta'])->name('whatsapp'); // Vista informativa de WhatsApp (autenticado)
     Route::get('/encuesta/{id}/whatsapp', [encuestasController::class, 'whatsapp'])->name('encuestas.whatsapp'); // Vista enviar por WhatsApp
     Route::post('/encuesta/{id}/whatsapp/enviar', [encuestasController::class, 'enviarWhatsapp'])->name('encuestas.whatsapp.enviar'); // Envío WhatsApp
     Route::get('/qr/{id}', [encuestasController::class, 'qr'])->name('encuestas.qr'); // Generar QR (SVG) del enlace público
